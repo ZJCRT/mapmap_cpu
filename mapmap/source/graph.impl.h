@@ -196,6 +196,49 @@ throw()
     m_nodes[node_b].incident_edges.push_back(new_edge_id);
 }
 
+template<typename COSTTYPE>
+FORCEINLINE
+void
+Graph<COSTTYPE>::
+increase_edge_weight(
+    const luint_t node_a,
+    const luint_t node_b,
+    const COSTTYPE weight)
+throw()
+{
+    luint_t edge_id = get_edge_id(node_a, node_b);
+    if (edge_id != m_edges.size()) {
+        m_edges[edge_id].weight += weight;
+    }
+    else {
+        add_edge(node_a, node_b, weight);
+    }
+}
+
+template<typename COSTTYPE>
+FORCEINLINE
+luint_t
+Graph<COSTTYPE>::
+get_edge_id(
+    const luint_t node_a,
+    const luint_t node_b) const
+throw()
+{
+    auto & edges_node_a = m_nodes[node_a].incident_edges;
+    auto & edges_node_b = m_nodes[node_b].incident_edges;
+    auto & edges_node = (edges_node_a.size() < edges_node_b.size()) ? edges_node_a : edges_node_b;
+    for (auto edge_id : edges_node)
+    {
+        auto & edge = m_edges[edge_id];
+        if (edge.node_a == node_a && edge.node_b == node_b) return edge_id;
+        if (edge.node_a == node_b && edge.node_b == node_a) return edge_id;
+    }
+
+    return m_edges.size();
+}
+
+
+
 /* ************************************************************************** */
 
 template<typename COSTTYPE>
